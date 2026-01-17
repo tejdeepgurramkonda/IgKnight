@@ -1,0 +1,39 @@
+.sound-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #a0a0a0);
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+}
+
+.sound-toggle:hover {
+  background: var(--hover-bg, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary, #ffffff);
+  border-color: var(--primary-color, #4a90e2);
+}
+
+.sound-toggle:active {
+  transform: scale(0.95);
+}
+
+.sound-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Muted state */
+.sound-toggle:has(svg path[d*="4.27 3L3 4.27"]) {
+  color: var(--error-color, #ff4444);
+}
+
+.sound-toggle:has(svg path[d*="4.27 3L3 4.27"]):hover {
+  background: rgba(255, 68, 68, 0.1);
+  border-color: var(--error-color, #ff4444);
+}

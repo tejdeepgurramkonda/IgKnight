@@ -1,10 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { GameProvider } from './context/GameContext';
+import { ToastProvider } from './context/ToastContext';
+import { SoundProvider } from './context/SoundContext';
+import LoadingSpinner from './components/LoadingSpinner';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
+import FindGame from './pages/FindGame';
 import OAuth2Redirect from './pages/OAuth2Redirect';
+import Game from './pages/Game';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -12,15 +18,8 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        color: 'var(--text-primary)',
-        fontSize: '1.25rem'
-      }}>
-        Loading...
+      <div className="loading-spinner-fullpage">
+        <LoadingSpinner size="large" message="Loading your session..." />
       </div>
     );
   }
@@ -34,15 +33,8 @@ const PublicRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        color: 'var(--text-primary)',
-        fontSize: '1.25rem'
-      }}>
-        Loading...
+      <div className="loading-spinner-fullpage">
+        <LoadingSpinner size="large" message="Loading..." />
       </div>
     );
   }
@@ -82,6 +74,22 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/find-game"
+          element={
+            <ProtectedRoute>
+              <FindGame />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/game/:gameId"
+          element={
+            <ProtectedRoute>
+              <Game />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>
     </AnimatePresence>
@@ -92,7 +100,13 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AnimatedRoutes />
+        <ToastProvider>
+          <SoundProvider>
+            <GameProvider>
+              <AnimatedRoutes />
+            </GameProvider>
+          </SoundProvider>
+        </ToastProvider>
       </AuthProvider>
     </Router>
   );

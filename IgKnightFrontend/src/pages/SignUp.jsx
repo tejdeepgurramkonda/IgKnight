@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import PasswordStrengthIndicator from '../components/PasswordStrengthIndicator';
 import './Auth.css';
 
 const SignUp = () => {
@@ -222,6 +223,7 @@ const SignUp = () => {
                 )}
               </button>
             </div>
+            <PasswordStrengthIndicator password={formData.password} />
             {!errors.password && (
               <span className="password-hint">Must be at least 8 characters</span>
             )}

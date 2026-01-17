@@ -12,11 +12,12 @@ const OAuth2Redirect = () => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
     const username = params.get('username');
+    const userId = params.get('userId');
 
     if (token && username) {
       // Store token and user data
       authAPI.handleOAuthCallback(token, username);
-      login(token, { username });
+      login(token, { userId: userId ? parseInt(userId) : null, username });
       navigate('/dashboard');
     } else {
       // If no token, redirect to signin with error

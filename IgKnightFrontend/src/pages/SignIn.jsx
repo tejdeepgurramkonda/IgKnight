@@ -117,7 +117,7 @@ const SignIn = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" aria-label="Sign in form">
           <div className="form-group">
             <label htmlFor="usernameOrEmail" className="form-label">
               Username or Email
@@ -131,9 +131,12 @@ const SignIn = () => {
               className={`form-input ${errors.usernameOrEmail ? 'error' : ''}`}
               placeholder="Enter your username or email"
               autoComplete="username"
+              aria-invalid={!!errors.usernameOrEmail}
+              aria-describedby={errors.usernameOrEmail ? "usernameOrEmail-error" : undefined}
+              required
             />
             {errors.usernameOrEmail && (
-              <span className="error-text">{errors.usernameOrEmail}</span>
+              <span className="error-text" id="usernameOrEmail-error" role="alert">{errors.usernameOrEmail}</span>
             )}
           </div>
 
@@ -156,6 +159,9 @@ const SignIn = () => {
                 className={`form-input ${errors.password ? 'error' : ''}`}
                 placeholder="Enter your password"
                 autoComplete="current-password"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? "password-error" : undefined}
+                required
               />
               <button
                 type="button"
@@ -177,7 +183,7 @@ const SignIn = () => {
               </button>
             </div>
             {errors.password && (
-              <span className="error-text">{errors.password}</span>
+              <span className="error-text" id="password-error" role="alert">{errors.password}</span>
             )}
           </div>
 

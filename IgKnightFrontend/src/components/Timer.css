@@ -1,0 +1,131 @@
+.timer-component {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 100px;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clock-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+}
+
+.time-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  transition: color 0.3s;
+}
+
+.timer-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.timer-progress-fill {
+  height: 100%;
+  background: var(--success-color);
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Time-based color states */
+.timer-component.normal .timer-progress-fill {
+  background: var(--success-color);
+}
+
+.timer-component.low .timer-progress-fill {
+  background: #f59e0b; /* orange */
+}
+
+.timer-component.low .time-text {
+  color: #f59e0b;
+}
+
+.timer-component.warning .timer-progress-fill {
+  background: #f97316; /* deeper orange */
+}
+
+.timer-component.warning .time-text {
+  color: #f97316;
+}
+
+.timer-component.warning .clock-icon {
+  color: #f97316;
+}
+
+.timer-component.critical .timer-progress-fill {
+  background: var(--error-color);
+  animation: pulse-bar 1s ease-in-out infinite;
+}
+
+.timer-component.critical .time-text {
+  color: var(--error-color);
+  animation: pulse-text 1s ease-in-out infinite;
+}
+
+.timer-component.critical .clock-icon {
+  color: var(--error-color);
+  animation: pulse-text 1s ease-in-out infinite;
+}
+
+/* Active player indicator */
+.timer-component.active {
+  position: relative;
+}
+
+.timer-component.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--accent-blue);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-bar {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-text {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-50%) scale(1.3);
+  }
+}

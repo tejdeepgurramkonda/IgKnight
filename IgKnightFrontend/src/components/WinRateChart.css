@@ -1,0 +1,125 @@
+.win-rate-chart {
+  padding: 1rem;
+}
+
+.chart-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+  font-size: 0.9375rem;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 1.5rem;
+  height: 200px;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+}
+
+.chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 60px;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.5rem;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: growBar 0.8s ease-out;
+}
+
+@keyframes growBar {
+  from {
+    height: 0 !important;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.win-bar {
+  background: linear-gradient(180deg, var(--success-color) 0%, rgba(16, 185, 129, 0.8) 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.draw-bar {
+  background: linear-gradient(180deg, #64748B 0%, rgba(100, 116, 139, 0.8) 100%);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+.loss-bar {
+  background: linear-gradient(180deg, var(--error-color) 0%, rgba(239, 68, 68, 0.8) 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.chart-bar:hover {
+  transform: scaleX(1.1);
+  filter: brightness(1.1);
+}
+
+.bar-label {
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.bar-title {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.win-dot {
+  background: var(--success-color);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.draw-dot {
+  background: #64748B;
+}
+
+.loss-dot {
+  background: var(--error-color);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.legend-text {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}

@@ -1,0 +1,112 @@
+/* Screen reader only text - visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link - visible on focus */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 10000;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Focus visible styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Remove focus outline when not using keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Better focus styles for specific elements */
+.chess-square:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: -3px;
+  z-index: 10;
+}
+
+.btn:focus-visible {
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+.modal-overlay:focus-visible {
+  outline: none;
+}
+
+.modal-content:focus-visible {
+  outline: 3px solid var(--primary-color);
+}
+
+/* Ensure sufficient color contrast */
+@media (prefers-color-scheme: light) {
+  :root {
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+  }
+}
+
+/* Screen reader announcements region */
+.sr-announcements {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+[aria-live] {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

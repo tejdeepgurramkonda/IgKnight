@@ -1,0 +1,118 @@
+.chess-square {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s ease;
+}
+
+.chess-square.light {
+  background-color: #f0d9b5;
+}
+
+.chess-square.dark {
+  background-color: #b58863;
+}
+
+.chess-square.selected {
+  background-color: #baca44 !important;
+  box-shadow: inset 0 0 0 3px rgba(186, 202, 68, 0.8);
+  animation: pulse-selected 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-selected {
+  0%, 100% {
+    box-shadow: inset 0 0 0 3px rgba(186, 202, 68, 0.8);
+  }
+  50% {
+    box-shadow: inset 0 0 0 3px rgba(186, 202, 68, 0.5);
+  }
+}
+
+.chess-square.legal-move {
+  cursor: pointer;
+  position: relative;
+}
+
+.chess-square.last-move {
+  background-color: rgba(255, 255, 102, 0.4) !important;
+  animation: fade-in-move 0.5s ease-out;
+}
+
+@keyframes fade-in-move {
+  from {
+    background-color: rgba(255, 255, 102, 0.8);
+  }
+  to {
+    background-color: rgba(255, 255, 102, 0.4);
+  }
+}
+
+.chess-square.check {
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.6) 0%, rgba(255, 0, 0, 0.2) 100%) !important;
+  animation: pulse-check 1s infinite;
+}
+
+@keyframes pulse-check {
+  0%, 100% {
+    box-shadow: inset 0 0 0 3px rgba(255, 0, 0, 0.8);
+  }
+  50% {
+    box-shadow: inset 0 0 0 3px rgba(255, 0, 0, 0.4);
+  }
+}
+
+.legal-move-dot {
+  width: 25%;
+  height: 25%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: pop-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.capture-indicator {
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: pop-in 0.2s cubic-bezier(0.4, 0, 0.2, 1), capture-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes capture-pulse {
+  0%, 100% {
+    border-color: rgba(0, 0, 0, 0.3);
+    border-width: 3px;
+  }
+  50% {
+    border-color: rgba(0, 0, 0, 0.5);
+    border-width: 4px;
+  }
+}
+
+.chess-square:hover.legal-move {
+  background-color: rgba(186, 202, 68, 0.6) !important;
+  transform: scale(0.98);
+  transition: all 0.15s ease;
+  box-shadow: inset 0 0 15px rgba(186, 202, 68, 0.4);
+}
+
+/* Piece hover glow effect */
+.chess-square:hover .chess-piece {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}

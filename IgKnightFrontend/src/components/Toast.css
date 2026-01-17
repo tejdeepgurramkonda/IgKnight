@@ -1,0 +1,103 @@
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--secondary-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  min-width: 300px;
+  max-width: 400px;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* Toast Types */
+.toast-success {
+  border-left: 3px solid var(--success-color);
+}
+
+.toast-success .toast-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+}
+
+.toast-error {
+  border-left: 3px solid var(--error-color);
+}
+
+.toast-error .toast-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error-color);
+}
+
+.toast-warning {
+  border-left: 3px solid #f59e0b;
+}
+
+.toast-warning .toast-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.toast-info {
+  border-left: 3px solid var(--accent-blue);
+}
+
+.toast-info .toast-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+}

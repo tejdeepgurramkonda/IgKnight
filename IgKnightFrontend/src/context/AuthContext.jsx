@@ -1,10 +1,16 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  }, []);
 
   useEffect(() => {
     // Check if user is logged in on mount
@@ -13,26 +19,41 @@ export const AuthProvider = ({ children }) => {
     
     if (token && userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        
+        // If userId is missing, decode it from the JWT token
+        if (!parsedUser.userId && token) {
+          try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            const payload = JSON.parse(jsonPayload);
+            
+            if (payload.userId) {
+              parsedUser.userId = payload.userId;
+              localStorage.setItem('user', JSON.stringify(parsedUser));
+            }
+          } catch (decodeError) {
+            console.error('Error decoding JWT:', decodeError);
+          }
+        }
+        
+        setUser(parsedUser);
       } catch (error) {
         console.error('Error parsing user data:', error);
         logout();
       }
     }
     setLoading(false);
-  }, []);
+  }, [logout]);
 
-  const login = (token, userData) => {
+  const login = useCallback((token, userData) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+  }, []);
 
   const value = {
     user,
