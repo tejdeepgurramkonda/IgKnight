@@ -1,5 +1,6 @@
 package com.example.IgKnight.chess.websocket;
 
+import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -112,6 +113,42 @@ public class GameWebSocketController {
         }
     }
 
+    @MessageMapping("/game/{gameId}/chat")
+    public void handleChat(@DestinationVariable Long gameId,
+                           @Payload Map<String, String> payload,
+                           SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            Long userId = extractUserId(headerAccessor);
+            String username = headerAccessor.getUser() != null ? headerAccessor.getUser().getName() : resolveUsername(headerAccessor);
+            String message = payload != null ? payload.getOrDefault("message", "") : "";
+            if (message == null || message.trim().isEmpty()) {
+                return;
+            }
+
+            Map<String, Object> chatMessage = Map.of(
+                "userId", userId,
+                "username", username,
+                "message", message.trim(),
+                "sentAt", Instant.now().toString()
+            );
+
+            webSocketService.notifyChatMessage(gameId, chatMessage);
+        } catch (Exception e) {
+            // Ignore errors silently for chat
+        }
+    }
+
+    private String resolveUsername(SimpMessageHeaderAccessor headerAccessor) {
+        String authHeader = headerAccessor.getFirstNativeHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if (jwtUtil.validateToken(token)) {
+                return jwtUtil.getUsernameFromToken(token);
+            }
+        }
+        return "";
+    }
+
     private Long extractUserId(SimpMessageHeaderAccessor headerAccessor) {
         if (headerAccessor.getUser() instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) headerAccessor.getUser();
@@ -119,6 +156,16 @@ public class GameWebSocketController {
                 return ((UserPrincipal) auth.getPrincipal()).getUserId();
             }
         }
+
+        // Fallback: parse JWT from native Authorization header
+        String authHeader = headerAccessor.getFirstNativeHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if (jwtUtil.validateToken(token)) {
+                return jwtUtil.getUserIdFromToken(token);
+            }
+        }
+
         throw new RuntimeException("User not authenticated");
     }
 }

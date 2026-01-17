@@ -11,26 +11,34 @@ const useSound = () => {
     return saved ? JSON.parse(saved) : false;
   });
 
-  useEffect(() => {
-    // Create audio context on first user interaction
-    if (!audioContextRef.current) {
+  const ensureContext = useCallback(() => {
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     }
+    return audioContextRef.current;
+  }, []);
+
+  useEffect(() => {
+    ensureContext();
     return () => {
       if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close();
       }
     };
-  }, []);
+  }, [ensureContext]);
 
   useEffect(() => {
     localStorage.setItem('soundMuted', JSON.stringify(isMuted));
   }, [isMuted]);
 
   const playTone = useCallback((frequency, duration, type = 'sine', volume = 0.3) => {
-    if (isMuted || !audioContextRef.current) return;
+    if (isMuted) return;
 
-    const ctx = audioContextRef.current;
+    const ctx = ensureContext();
+    if (!ctx || ctx.state === 'closed') return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
 
@@ -56,9 +64,13 @@ const useSound = () => {
 
   // Capture sound - lower pitch with quick decay
   const playCapture = useCallback(() => {
-    if (isMuted || !audioContextRef.current) return;
+    if (isMuted) return;
 
-    const ctx = audioContextRef.current;
+    const ctx = ensureContext();
+    if (!ctx || ctx.state === 'closed') return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
 

@@ -264,6 +264,13 @@ public class GameService {
         movePayload.put("from", request.getFrom());
         movePayload.put("to", request.getTo());
         movePayload.put("san", gameMove.getSanNotation());
+        if (movePayload.get("san") == null) {
+            String fallbackSan = request.getFrom() + request.getTo();
+            if (request.getPromotion() != null && !request.getPromotion().isBlank()) {
+                fallbackSan += request.getPromotion();
+            }
+            movePayload.put("san", fallbackSan);
+        }
         movePayload.put("fenAfterMove", gameMove.getFenAfterMove());
         movePayload.put("whiteTimeRemaining", game.getWhiteTimeRemaining());
         movePayload.put("blackTimeRemaining", game.getBlackTimeRemaining());
@@ -473,7 +480,14 @@ public class GameService {
             moveInfo.setFrom(move.getFromSquare());
             moveInfo.setTo(move.getToSquare());
             moveInfo.setPiece(move.getPieceType());
-            moveInfo.setSan(move.getSanNotation());
+            String san = move.getSanNotation();
+            if (san == null || san.isBlank()) {
+                san = move.getFromSquare() + move.getToSquare();
+                if (move.getPromotionPiece() != null) {
+                    san = san + move.getPromotionPiece().charAt(0);
+                }
+            }
+            moveInfo.setSan(san);
             moveInfo.setResultingFen(move.getFenAfterMove());
             moveInfo.setIsCapture(move.getIsCapture());
             moveInfo.setIsCheck(move.getIsCheck());

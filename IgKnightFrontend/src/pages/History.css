@@ -1,0 +1,122 @@
+.history-page {
+  padding: 24px;
+  color: var(--text-primary);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.history-header h1 {
+  margin: 0;
+}
+
+.history-cta {
+  background: var(--accent, #4a90e2);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+}
+
+.history-card {
+  background: var(--card-bg, #11161d);
+  border: 1px solid var(--border, #1f2a35);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.result-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.result-pill.win { background: rgba(67, 181, 129, 0.15); color: #43b581; }
+.result-pill.loss { background: rgba(240, 71, 71, 0.15); color: #f04747; }
+.result-pill.draw { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+
+.history-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.players {
+  display: flex;
+  gap: 16px;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.player-name {
+  font-weight: 600;
+}
+
+.meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.history-actions .secondary {
+  background: transparent;
+  border: 1px solid var(--border, #1f2a35);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 32px;
+  background: var(--card-bg, #11161d);
+  border: 1px solid var(--border, #1f2a35);
+  border-radius: 12px;
+}
+
+.history-error {
+  color: #f04747;
+  padding: 12px;
+  border: 1px solid #f04747;
+  border-radius: 8px;
+  background: rgba(240, 71, 71, 0.1);
+}

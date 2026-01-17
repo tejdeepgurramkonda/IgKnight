@@ -41,6 +41,7 @@ const PublicRoute = ({ children }) => {
 
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
+import History from './pages/History';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -87,6 +88,14 @@ function AnimatedRoutes() {
           element={
             <ProtectedRoute>
               <Game />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
             </ProtectedRoute>
           }
         />

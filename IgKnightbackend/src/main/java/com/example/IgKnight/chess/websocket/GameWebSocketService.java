@@ -37,6 +37,11 @@ public class GameWebSocketService {
         messagingTemplate.convertAndSend(destination, playerData);
     }
 
+    public void notifyChatMessage(Long gameId, Object chatMessage) {
+        String destination = "/topic/game/" + gameId + "/chat";
+        messagingTemplate.convertAndSend(destination, chatMessage);
+    }
+
     public void sendToUser(String username, String destination, Object payload) {
         messagingTemplate.convertAndSendToUser(username, destination, payload);
     }

@@ -4,10 +4,20 @@ import { Client } from '@stomp/stompjs';
 
 const WS_URL = 'http://localhost:8081/ws/chess';
 
-export const useGameWebSocket = (gameId, onGameUpdate, onMoveReceived, onGameEnd) => {
+export const useGameWebSocket = (gameId, onGameUpdate, onMoveReceived, onGameEnd, onChatReceived) => {
   const clientRef = useRef(null);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(null);
+
+  const gameUpdateRef = useRef(onGameUpdate);
+  const moveReceivedRef = useRef(onMoveReceived);
+  const gameEndRef = useRef(onGameEnd);
+  const chatReceivedRef = useRef(onChatReceived);
+
+  useEffect(() => { gameUpdateRef.current = onGameUpdate; }, [onGameUpdate]);
+  useEffect(() => { moveReceivedRef.current = onMoveReceived; }, [onMoveReceived]);
+  useEffect(() => { gameEndRef.current = onGameEnd; }, [onGameEnd]);
+  useEffect(() => { chatReceivedRef.current = onChatReceived; }, [onChatReceived]);
 
   useEffect(() => {
     if (!gameId) return;
@@ -36,34 +46,34 @@ export const useGameWebSocket = (gameId, onGameUpdate, onMoveReceived, onGameEnd
       setConnected(true);
       setError(null);
 
-      // Subscribe to game updates
       client.subscribe(`/topic/game/${gameId}`, (message) => {
         const gameData = JSON.parse(message.body);
-        onGameUpdate?.(gameData);
+        gameUpdateRef.current?.(gameData);
       });
 
-      // Subscribe to move notifications
       client.subscribe(`/topic/game/${gameId}/move`, (message) => {
         const moveData = JSON.parse(message.body);
-        onMoveReceived?.(moveData);
+        moveReceivedRef.current?.(moveData);
       });
 
-      // Subscribe to game end notifications
       client.subscribe(`/topic/game/${gameId}/end`, (message) => {
         const endData = JSON.parse(message.body);
-        onGameEnd?.(endData);
+        gameEndRef.current?.(endData);
       });
 
-      // Subscribe to game start notifications
       client.subscribe(`/topic/game/${gameId}/start`, (message) => {
         const startData = JSON.parse(message.body);
-        onGameUpdate?.(startData);
+        gameUpdateRef.current?.(startData);
       });
 
-      // Subscribe to player joined notifications
+      client.subscribe(`/topic/game/${gameId}/chat`, (message) => {
+        const chatData = JSON.parse(message.body);
+        chatReceivedRef.current?.(chatData);
+      });
+
       client.subscribe(`/topic/game/${gameId}/player-joined`, (message) => {
         const playerData = JSON.parse(message.body);
-        onGameUpdate?.(playerData);
+        gameUpdateRef.current?.(playerData);
       });
     };
 
@@ -86,7 +96,7 @@ export const useGameWebSocket = (gameId, onGameUpdate, onMoveReceived, onGameEnd
         clientRef.current.deactivate();
       }
     };
-  }, [gameId, onGameUpdate, onMoveReceived, onGameEnd]);
+  }, [gameId]);
 
   const sendMove = useCallback((from, to, promotion = null) => {
     if (clientRef.current && connected) {
@@ -106,11 +116,21 @@ export const useGameWebSocket = (gameId, onGameUpdate, onMoveReceived, onGameEnd
     }
   }, [gameId, connected]);
 
+  const sendChat = useCallback((text) => {
+    if (clientRef.current && connected) {
+      clientRef.current.publish({
+        destination: `/app/game/${gameId}/chat`,
+        body: JSON.stringify({ message: text }),
+      });
+    }
+  }, [gameId, connected]);
+
   return {
     connected,
     error,
     sendMove,
     resignGame,
+    sendChat,
   };
 };
 

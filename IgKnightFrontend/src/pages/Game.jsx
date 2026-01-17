@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameContext';
@@ -32,6 +32,10 @@ const Game = () => {
   const [gameStartSoundPlayed, setGameStartSoundPlayed] = useState(false);
   const [viewingMoveIndex, setViewingMoveIndex] = useState(null);
   const [viewingPosition, setViewingPosition] = useState(null);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const chatMessagesEndRef = useRef(null);
+  const [handledGameEnd, setHandledGameEnd] = useState(false);
 
   const handleGameUpdate = useCallback((gameData) => {
     updateCurrentGame(gameData);
@@ -88,6 +92,7 @@ const Game = () => {
 
   const handleGameEnd = useCallback((endData) => {
     console.log('Game ended:', endData);
+
     if (typeof endData?.whiteTimeRemaining === 'number') {
       setWhiteTime(endData.whiteTimeRemaining);
     }
@@ -102,14 +107,44 @@ const Game = () => {
         syncedAt: Date.now(),
       });
     }
-  }, []);
 
-  const { connected, sendMove, resignGame: wsResignGame } = useGameWebSocket(
+    if (endData?.status && currentGame) {
+      updateCurrentGame({
+        ...currentGame,
+        status: endData.status,
+        winnerId: endData.winnerId ?? currentGame.winnerId,
+      });
+    }
+
+    if (handledGameEnd) return;
+
+    if (endData?.status === 'RESIGNATION') {
+      const resignedId = endData.resignedUserId;
+      const winnerId = endData.winnerId;
+      if (resignedId && user?.userId && resignedId === user.userId) {
+        setHandledGameEnd(true);
+        toast.info('You resigned. Returning to dashboard.');
+        setTimeout(() => navigate('/dashboard'), 500);
+      } else if (winnerId && user?.userId && winnerId === user.userId) {
+        setHandledGameEnd(true);
+        toast.success('Opponent resigned. You win!');
+      }
+    }
+  }, [handledGameEnd, navigate, toast, updateCurrentGame, user, currentGame]);
+
+  const { connected, sendMove, resignGame: wsResignGame, sendChat } = useGameWebSocket(
     gameId,
     handleGameUpdate,
     handleMoveReceived,
-    handleGameEnd
+    handleGameEnd,
+    (msg) => setChatMessages((prev) => [...prev, msg])
   );
+
+  useEffect(() => {
+    setChatMessages([]);
+    setChatInput('');
+    setHandledGameEnd(false);
+  }, [gameId]);
 
   useEffect(() => {
     let initialGameStatus = null;
@@ -279,6 +314,19 @@ const Game = () => {
     }
   };
 
+  const handleSendChat = () => {
+    const text = chatInput.trim();
+    if (!text || !connected) return;
+    sendChat(text);
+    setChatInput('');
+  };
+
+  useEffect(() => {
+    if (chatMessagesEndRef.current) {
+      chatMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
+
   // Keyboard navigation
   useKeyboardNavigation({
     onEscape: () => {
@@ -321,6 +369,14 @@ const Game = () => {
       setViewingPosition(move.resultingFen);
     }
   };
+
+  // When new moves arrive and we're following live, keep view at the latest move
+  useEffect(() => {
+    if (!currentGame?.moves) return;
+    if (viewingMoveIndex === null) {
+      setViewingPosition(null);
+    }
+  }, [currentGame?.moves, viewingMoveIndex]);
 
   const returnToCurrentPosition = () => {
     setViewingMoveIndex(null);
@@ -481,6 +537,36 @@ const Game = () => {
           </div>
         )}
         
+        <div className="chat-card">
+          <div className="chat-header">Game Chat</div>
+          <div className="chat-messages">
+            {chatMessages.length === 0 && <div className="chat-empty">No messages yet</div>}
+            {chatMessages.map((m, idx) => (
+              <div key={idx} className={`chat-line ${m.userId === user?.userId ? 'self' : ''}`}>
+                <span className="chat-user">{m.username || 'Player'}:</span>
+                <span className="chat-text">{m.message}</span>
+              </div>
+            ))}
+            <div ref={chatMessagesEndRef} />
+          </div>
+          <div className="chat-input-row">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder={connected ? 'Type a message...' : 'Connecting...'}
+              disabled={!connected}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSendChat();
+                }
+              }}
+            />
+            <button onClick={handleSendChat} disabled={!connected || !chatInput.trim()}>Send</button>
+          </div>
+        </div>
+
         <MoveList
           moves={currentGame.moves || []}
           currentMoveIndex={viewingMoveIndex ?? (currentGame.moves?.length - 1)}

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './MoveList.css';
 
 const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
   const [hoveredMove, setHoveredMove] = useState(null);
+  const scrollRef = useRef(null);
 
   // Group moves into pairs (white, black)
   const movePairs = [];
@@ -38,9 +39,11 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
     // Moves
     for (let i = 0; i < movePairs.length; i++) {
       const pair = movePairs[i];
-      pgn += `${pair.moveNumber}. ${pair.white.san || pair.white.sanNotation || pair.white.notation}`;
+      const whiteSan = pair.white.san || pair.white.sanNotation || pair.white.notation || `${pair.white.from}${pair.white.to}`;
+      pgn += `${pair.moveNumber}. ${whiteSan}`;
       if (pair.black) {
-        pgn += ` ${pair.black.san || pair.black.sanNotation || pair.black.notation}`;
+        const blackSan = pair.black.san || pair.black.sanNotation || pair.black.notation || `${pair.black.from}${pair.black.to}`;
+        pgn += ` ${blackSan}`;
       }
       pgn += ' ';
       
@@ -72,9 +75,11 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
     let pgn = '';
     for (let i = 0; i < movePairs.length; i++) {
       const pair = movePairs[i];
-      pgn += `${pair.moveNumber}. ${pair.white.san || pair.white.sanNotation || pair.white.notation}`;
+      const whiteSan = pair.white.san || pair.white.sanNotation || pair.white.notation || `${pair.white.from}${pair.white.to}`;
+      pgn += `${pair.moveNumber}. ${whiteSan}`;
       if (pair.black) {
-        pgn += ` ${pair.black.san || pair.black.sanNotation || pair.black.notation}`;
+        const blackSan = pair.black.san || pair.black.sanNotation || pair.black.notation || `${pair.black.from}${pair.black.to}`;
+        pgn += ` ${blackSan}`;
       }
       pgn += ' ';
     }
@@ -84,6 +89,17 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
       console.log('PGN copied to clipboard');
     });
   };
+
+  // Auto-scroll to bottom when new moves arrive unless user is viewing history
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    // If user is at bottom or we're following live, scroll to bottom
+    const el = scrollRef.current;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+    if (isNearBottom || currentMoveIndex === moves.length - 1) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [moves, currentMoveIndex]);
 
   return (
     <div className="move-list-container">
@@ -115,7 +131,7 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
         )}
       </div>
 
-      <div className="move-list-scroll">
+      <div className="move-list-scroll" ref={scrollRef}>
         {moves && moves.length > 0 ? (
           <div className="move-pairs">
             {movePairs.map((pair) => (
@@ -126,9 +142,9 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
                   onClick={() => handleMoveClick(pair.whiteIndex)}
                   onMouseEnter={() => setHoveredMove(pair.whiteIndex)}
                   onMouseLeave={() => setHoveredMove(null)}
-                  aria-label={`Move ${pair.moveNumber}, white: ${pair.white.san || pair.white.sanNotation || pair.white.notation}`}
+                  aria-label={`Move ${pair.moveNumber}, white: ${pair.white.san || pair.white.sanNotation || pair.white.notation || `${pair.white.from}${pair.white.to}`}`}
                 >
-                  {pair.white.san || pair.white.sanNotation || pair.white.notation}
+                  {pair.white.san || pair.white.sanNotation || pair.white.notation || `${pair.white.from}${pair.white.to}`}
                 </button>
                 {pair.black && (
                   <button
@@ -136,9 +152,9 @@ const MoveList = ({ moves, currentMoveIndex, onMoveClick, onExportPGN }) => {
                     onClick={() => handleMoveClick(pair.blackIndex)}
                     onMouseEnter={() => setHoveredMove(pair.blackIndex)}
                     onMouseLeave={() => setHoveredMove(null)}
-                    aria-label={`Move ${pair.moveNumber}, black: ${pair.black.san || pair.black.sanNotation || pair.black.notation}`}
+                    aria-label={`Move ${pair.moveNumber}, black: ${pair.black.san || pair.black.sanNotation || pair.black.notation || `${pair.black.from}${pair.black.to}`}`}
                   >
-                    {pair.black.san || pair.black.sanNotation || pair.black.notation}
+                    {pair.black.san || pair.black.sanNotation || pair.black.notation || `${pair.black.from}${pair.black.to}`}
                   </button>
                 )}
               </div>

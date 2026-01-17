@@ -21,10 +21,11 @@
 
 .chart-bar-wrapper {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  justify-items: center;
+  row-gap: 0.5rem;
   height: 100%;
 }
 
